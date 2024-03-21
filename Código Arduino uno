@@ -1,0 +1,301 @@
+#include <SoftwareSerial.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+#define high1 2
+#define half1 3
+#define low1  4 
+#define high2 11
+#define half2 12
+#define low2  13 
+
+char dado;
+int IN1 = 6;
+int IN2 = 7;
+int velocidadeA= 5; 
+int velocidade = 0;
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+
+#define valvula1
+#define valvula2
+
+SoftwareSerial mySerial(A3, A2);
+
+//#define high
+//#define low
+//#define motormistura
+
+int vol1 = 0, vol2 =0, vol = 0;
+int carga1, carga2;
+
+
+void apagatudo();
+void enchendo1();
+void enchendo2();
+void esvazia1();
+void esvazia2();
+
+void setup() {
+  Serial.begin(9600);
+  mySerial.begin(9600);
+  pinMode(high1, OUTPUT);
+  pinMode(half1, OUTPUT);
+  pinMode(low1, OUTPUT);
+  pinMode(high2, OUTPUT);
+  pinMode(half2, OUTPUT);
+  pinMode(low2, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(velocidadeA, OUTPUT);
+  lcd.init();
+  lcd.backlight();
+  apagatudo();
+
+}
+
+void loop() {
+  enchendo1();
+  enchendo2();
+  leSerial();
+  leSerial();
+  if((carga1+carga2)>0){
+  lcdmotor();
+  }
+}
+
+void enchendo1() {
+  while(vol1 <3000){
+    while(vol1 <  2500){
+      while(vol1 < 2300){
+        while(vol1 < 2000){
+          while (vol1 < 1500){
+            while(vol1 < 1300){
+              while(vol1 < 1000){
+                while(vol1 < 500){
+                  while(vol1 < 300){
+                    digitalWrite(low1, HIGH);
+                    delay(30);
+                    digitalWrite(low1, LOW);
+                    delay(70); 
+                    vol1 = vol1 + 15;
+                    }
+                  digitalWrite(low1, HIGH);
+                  delay(50);
+                  digitalWrite(low1, LOW);
+                  delay(50);
+                  vol1 = vol1 + 15;
+                  }
+                digitalWrite(low1, HIGH);
+                delay(70);
+                digitalWrite(low1, LOW);
+                delay(30);
+                vol1 = vol1 + 15;
+                }
+              digitalWrite(low1, HIGH);
+              digitalWrite(half1, HIGH);
+                    delay(30);
+                    digitalWrite(half1, LOW);
+                    delay(70); 
+                    vol1 = vol1 + 15;
+            }
+            digitalWrite(half1, HIGH);
+                    delay(50);
+                    digitalWrite(half1, LOW);
+                    delay(50);
+                    vol1 = vol1 + 15;
+            }
+          digitalWrite(half1, HIGH);
+                delay(70);
+                digitalWrite(half1, LOW);
+                delay(30);
+                vol1 = vol1 + 15;
+          }
+          digitalWrite(half1, HIGH);
+          digitalWrite(high1, HIGH);
+                    delay(30);
+                    digitalWrite(high1, LOW);
+                    delay(70); 
+                    vol1 = vol1 + 15;
+                    }
+                  digitalWrite(high1, HIGH);
+                  delay(50);
+                  digitalWrite(high1, LOW);
+                  delay(50);
+                  vol1 = vol1 + 15;
+                  }
+                digitalWrite(high1, HIGH);
+                delay(70);
+                digitalWrite(high1, LOW);
+                delay(30);
+                vol1 = vol1 + 15;
+    }
+  digitalWrite(high1, HIGH);
+}
+void enchendo2() {
+  while(vol2 <3000){
+    while(vol2 <  2500){
+      while(vol2 < 2300){
+        while(vol2 < 2000){
+          while (vol2 < 1500){
+            while(vol2 < 1300){
+              while(vol2 < 1000){
+                while(vol2 < 500){
+                  while(vol2 < 300){
+                    digitalWrite(low2, HIGH);
+                    delay(30);
+                    digitalWrite(low2, LOW);
+                    delay(70); 
+                    vol2 = vol2 + 15;
+                    }
+                  digitalWrite(low2, HIGH);
+                  delay(50);
+                  digitalWrite(low2, LOW);
+                  delay(50);
+                  vol2 = vol2 + 15;
+                  }
+                digitalWrite(low2, HIGH);
+                delay(70);
+                digitalWrite(low2, LOW);
+                delay(30);
+                vol2 = vol2 + 15;
+                }
+              digitalWrite(low2, HIGH);
+              digitalWrite(half2, HIGH);
+                    delay(30);
+                    digitalWrite(half2, LOW);
+                    delay(70); 
+                    vol2 = vol2 + 15;
+            }
+            digitalWrite(half2, HIGH);
+                    delay(50);
+                    digitalWrite(half2, LOW);
+                    delay(50);
+                    vol2 = vol2 + 15;
+            }
+          digitalWrite(half2, HIGH);
+                delay(70);
+                digitalWrite(half2, LOW);
+                delay(30);
+                vol2 = vol2 + 15;
+          }
+          digitalWrite(half2, HIGH);
+          digitalWrite(high2, HIGH);
+                    delay(30);
+                    digitalWrite(high2, LOW);
+                    delay(70); 
+                    vol2 = vol2 + 15;
+                    }
+                  digitalWrite(high2, HIGH);
+                  delay(50);
+                  digitalWrite(high2, LOW);
+                  delay(50);
+                  vol2 = vol2 + 15;
+                  }
+                digitalWrite(high2, HIGH);
+                delay(70);
+                digitalWrite(high2, LOW);
+                delay(30);
+                vol2 = vol2 + 15;
+    }
+  digitalWrite(high2, HIGH);
+}
+void apagatudo()  {
+  digitalWrite(low1, LOW);
+  digitalWrite(half1, LOW);
+  digitalWrite(high1, LOW);
+  digitalWrite(low2, LOW);
+  digitalWrite(half2, LOW);
+  digitalWrite(high2, LOW);
+  //digitalWrite(low, LOW);
+  //digitalWrite(high, LOW);
+}
+
+void leSerial()
+{
+  if (mySerial.available()) {
+  dado=(mySerial.read());
+  escreveBluetooth();
+  }  
+}
+
+void esvazia1() {
+ vol1 = vol1 - carga1*1000;
+ digitalWrite(high1, LOW);
+ if(vol1 < 2000){
+  digitalWrite(half1, LOW);
+ }
+ if(vol1 < 1000){
+  digitalWrite(low1, LOW);
+ }
+}
+void esvazia2() {
+ vol2 = vol2 - carga2*1000;
+ digitalWrite(high2, LOW);
+ if(vol2 < 2000){
+  digitalWrite(half2, LOW);
+ }
+ if(vol2 < 1000){
+  digitalWrite(low2, LOW);
+ }
+}
+void lcdmotor(){
+   
+int Leitura1 = analogRead(A0);
+float Temperatura = map(Leitura1, 0, 1023, 17, 40);
+
+lcd.setCursor(0, 1);
+lcd.print("Temp: ");
+lcd.print(Temperatura);
+lcd.print(" C");
+analogWrite(velocidadeA,80);
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, LOW);
+delay(3000);
+
+digitalWrite(IN1, HIGH);
+digitalWrite(IN2, HIGH);
+delay(2000);
+
+}
+void escreveBluetooth()
+{
+  if(dado=='a') 
+  {
+  carga1 = 1;
+  carga2 = 1;
+  esvazia1();
+  esvazia2();
+
+ }
+    if(dado=='b')    {
+      carga1 = 1;
+      carga2 = 2;
+      esvazia1();
+      esvazia2();
+    } 
+    if(dado=='c')    {
+      carga1 = 2;
+      carga2 = 1;
+      esvazia1();
+      esvazia2();
+    }    
+    if(dado=='d')    {
+      carga1 = 2;
+      carga2 = 2;
+      esvazia1();
+      esvazia2();
+    }
+ if(dado=='e')    {
+      carga1 = 2;
+      carga2 = 3;
+      esvazia1();
+      esvazia2();
+    }
+if(dado=='f')    {
+      carga1 = 3;
+      carga2 = 3;
+    esvazia1();
+    esvazia2();
+    }
+}
