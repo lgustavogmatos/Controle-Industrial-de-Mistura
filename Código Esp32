@@ -1,0 +1,103 @@
+#include "BluetoothSerial.h"
+
+#define lowl 26
+#define lowh 25
+#define halfl 33
+#define halfh 32
+#define highl 35
+#define highh 34
+
+#define valvula1
+#define valvula2
+
+BluetoothSerial SerialBT;
+
+void leBluetooth1();
+void leBluetooth2();
+void configuraBluetooh();
+void enviacarga1();
+void enviacarga2();
+void enchetank();
+
+
+int carga1 = 0, carga2 = 0;
+int mistura[] = { 26, 25, 33, 32, 12, 14 };
+int vol = 0;
+char dado;
+
+void setup() {
+
+  pinMode(highh, OUTPUT);
+  pinMode(highl, OUTPUT);
+  pinMode(halfh, OUTPUT);
+  pinMode(halfl, OUTPUT);
+  pinMode(lowh, OUTPUT);
+  pinMode(lowl, OUTPUT);
+  Serial.begin(9600);
+  Serial2.begin(9600);
+  configuraBluetooh();
+}
+
+void loop() {
+
+
+  leBluetooth();
+  leBluetooth();
+  enchetank();
+}
+
+void configuraBluetooh() {
+  SerialBT.begin("Tanque de Mistura");
+  Serial.println("O dispositivo foi iniciado, agora você pode emparelhá-lo com bluetooth!");
+}
+
+void enchetank() {
+  if((carga1 + carga2)>0){
+  vol = (carga1 + carga2) * 1000;
+  if ((carga1 + carga2 > 0)) {
+    for (int i = 0; i < (carga1 + carga2); i++) {
+      digitalWrite(mistura[i], HIGH);
+      delay(500);
+    }
+  }
+}
+}
+
+void escreveBluetooth() {
+  if (dado == 'a') {
+    carga1 = 1;
+    carga2 = 1;
+    Serial2.write("a");
+  }
+  if (dado == 'b') {
+    carga1 = 1;
+    carga2 = 2;
+    Serial2.write("b");
+  }
+  if (dado == 'c') {
+    carga1 = 2;
+    carga2 = 1;
+    Serial2.write("c");
+  }
+  if (dado == 'd') {
+    carga1 = 2;
+    carga2 = 2;
+    Serial2.write("d");
+  }
+  if (dado == 'e') {
+    carga1 = 2;
+    carga2 = 3;
+    Serial2.write("e");
+  }
+  if (dado == 'f') {
+    carga1 = 3;
+    carga2 = 3;
+    Serial2.write("f");
+  }
+}
+void leBluetooth() {
+  if (SerialBT.available()) {
+    dado = (SerialBT.read());
+    escreveBluetooth();
+  }
+}
